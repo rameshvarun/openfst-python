@@ -216,8 +216,18 @@ setup(
         name="openfst_python.pywrapfst",
         sources=[os.path.join("openfst-1.7.3", "src/extensions/python/pywrapfst.cc")],
         include_dirs=[os.path.join("openfst-1.7.3", "src/include/")],
+        library_dirs=[
+            os.path.join("openfst-1.7.3", "src/lib/.libs/"),
+            os.path.join("openfst-1.7.3", "src/extensions/far/.libs/"),
+            os.path.join("openfst-1.7.3", "src/script/.libs/"),
+        ],
+        libraries=["fst", "fstscript", "fstfar", "fstfarscript"],
+        extra_link_args = ["-Wl,-rpath=$ORIGIN/lib/."],
     )],
-    cmdclass=dict(build=OpenFstBuild, build_ext=OpenFstBuildExt),
+    package_data={
+        'openfst_python': ['lib/*']
+    },
+    # cmdclass=dict(build=OpenFstBuild, build_ext=OpenFstBuildExt),
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
