@@ -14,7 +14,7 @@ from setuptools.command.build_ext import build_ext
 from Cython.Build import cythonize
 
 
-OPENFST_VERSION = "1.7.9"
+OPENFST_VERSION = "1.7.3"
 
 
 def copy(src, dst):
@@ -74,35 +74,14 @@ class OpenFstBuild(build):
 
 
 class OpenFstBuildExt(build_ext):
-
-    user_options = build_ext.user_options + [
-        (
-            "download-dir=",
-            None,
-            "directory containing the openfst-%s.tar.gz file" % OPENFST_VERSION,
-        )
-    ]
-
-    @property
-    def openfst_basename(self):
-        return "openfst-%s.tar.gz" % OPENFST_VERSION
-
     @property
     def openfst_dirname(self):
-        return "%s/openfst-%s" % (self.build_temp, OPENFST_VERSION)
+        return "./openfst-%s" % (OPENFST_VERSION)
 
     @property
     def openfst_filename(self):
         return os.path.join(self.download_dir, self.openfst_basename)
 
-    @property
-    def openfst_url(self):
-        base_url = "http://www.openfst.org/twiki/pub/FST/FstDownload"
-        return "%s/%s" % (base_url, self.openfst_basename)
-
-    @property
-    def openfst_main_lib(self):
-        return "%s/src/extensions/python/.libs/pywrapfst.so" % self.openfst_dirname
 
     @property
     def openfst_deps_libs(self):
@@ -148,10 +127,6 @@ class OpenFstBuildExt(build_ext):
         if not os.path.exists(self.openfst_main_lib):
             old_dir = os.getcwd()
             os.chdir(self.openfst_dirname)
-            if os.path.exists("Makefile"):
-                subprocess.check_call(["make", "distclean"])
-            subprocess.check_call(["aclocal"])
-            subprocess.check_call(["autoconf", "-f"])
             configure_cmd = [
                 "./configure",
                 "--enable-compact-fsts",
@@ -160,16 +135,13 @@ class OpenFstBuildExt(build_ext):
                 "--enable-far",
                 "--enable-linear-fsts",
                 "--enable-lookahead-fsts",
-                "--enable-python",
                 "--enable-special",
             ]
             subprocess.check_call(configure_cmd)
             subprocess.check_call(["make", "-j8"])
             os.chdir(old_dir)
 
-    def openfst_copy_libraries(self, ext):
-        main_lib_output_path = os.path.join(self.build_lib, ext._file_name)
-        copy(self.openfst_main_lib, main_lib_output_path)
+    def openfst_copy_libraries(self):
         for src in self.openfst_deps_libs:
             dst = "%s/%s" % (self.output_dir, get_filename_with_sha256(src))
             copy(src, dst)
@@ -220,14 +192,10 @@ class OpenFstBuildExt(build_ext):
                 patchelf_rpath_origin(sofile)
 
     def run(self):
-        self.openfst_download()
-        self.openfst_extract()
+        super().run()
         self.openfst_configure_and_make()
-        self.openfst_copy_libraries(self.extensions[0])
+        self.openfst_copy_libraries()
         self.openfst_fix_libraries()
-
-        cmd = self.get_finalized_command("build_py").build_lib
-        self.write_stub(cmd, self.extensions[0])
 
 
 with open(os.path.join(os.path.dirname(__file__), "README.md"), "r") as fh:
@@ -244,7 +212,11 @@ setup(
     author_email="joapuipe@gmail.com",
     license="MIT",
     packages=find_packages(),
-    ext_modules=[OpenFstExtension()],
+    ext_modules=[Extension(
+        name="openfst_python.pywrapfst",
+        sources=[os.path.join("openfst-1.7.3", "src/extensions/python/pywrapfst.cc")],
+        include_dirs=[os.path.join("openfst-1.7.3", "src/include/")],
+    )],
     cmdclass=dict(build=OpenFstBuild, build_ext=OpenFstBuildExt),
     classifiers=[
         "Development Status :: 4 - Beta",
