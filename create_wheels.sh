@@ -34,7 +34,7 @@ for py in cp36-cp36m; do
     export PATH="$PATH:/opt/python/$py/bin/"
     echo "=== Installing dependencies for $py ===";
     $PYTHON -m pip install -U pip;
-    $PYTHON -m pip install -U requests==2 wheel==0.37 setuptools==59.6.0 Cython==0.29;
+    $PYTHON -m pip install -U requests==2.27 wheel==0.37 setuptools==59.6 Cython==0.29 auditwheel==1.0;
     echo "=== Building for $py ==="
     $PYTHON setup.py clean;
     $PYTHON setup.py bdist_wheel;
@@ -46,17 +46,3 @@ for py in cp36-cp36m; do
     $PYTHON -m unittest openfst_python.test;
   )
 done;
-
-set +x;
-ODIR="/host/tmp/openfst_python/whl";
-mkdir -p "$ODIR";
-readarray -t wheels < <(find /tmp/src/dist -name "*.whl");
-for whl in "${wheels[@]}"; do
-  whl_name="$(basename "$whl")";
-  whl_name="${whl_name/-linux/-manylinux1}";
-  cp "$whl" "${ODIR}/${whl_name}";
-done;
-
-echo "================================================================";
-printf "=== %-56s ===\n" "Copied ${#wheels[@]} wheels to ${ODIR:5}";
-echo "================================================================";

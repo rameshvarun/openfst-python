@@ -11,12 +11,23 @@ import sys
 from distutils.command.build import build
 from setuptools import setup, find_packages, Extension
 from setuptools.command.build_ext import build_ext
+from distutils.command.clean import clean
 from Cython.Build import cythonize
 
 OPENFST_VERSION = "1.7.3"
 OPENFST_DIR = f"./openfst-{OPENFST_VERSION}"
 OPENFST_ARCHIVE = f"openfst-{OPENFST_VERSION}.tar.gz"
 OPENFST_URL = f"http://www.openfst.org/twiki/pub/FST/FstDownload/{OPENFST_ARCHIVE}"
+
+PACKAGE_DIR = os.path.realpath(os.path.dirname(__file__))
+
+class OpenFstClean(clean):
+    def run(self):
+        if os.path.exists(OPENFST_DIR):
+            shutil.rmtree(OPENFST_DIR)
+        if os.path.exists(OPENFST_ARCHIVE):
+            os.remove(OPENFST_ARCHIVE)
+        super().run()
 
 class OpenFstBuildExt(build_ext):
     def openfst_download_and_extract(self):
@@ -86,16 +97,16 @@ setup(
     packages=find_packages(),
     ext_modules=[Extension(
         name="openfst_python.pywrapfst",
-        sources=[os.path.join("openfst-1.7.3", "src/extensions/python/pywrapfst.cc")],
-        include_dirs=[os.path.join("openfst-1.7.3", "src/include/")],
-        library_dirs=["openfst_python/lib"],
+        sources=[os.path.join(OPENFST_DIR, "src/extensions/python/pywrapfst.cc")],
+        include_dirs=[os.path.join(OPENFST_DIR, "src/include/")],
+        library_dirs=[os.path.join(PACKAGE_DIR, "./openfst_python/lib")],
         libraries=["fst", "fstscript", "fstfar", "fstfarscript"],
         extra_link_args = ["-Wl,-rpath=$ORIGIN/lib/."],
     )],
     package_data={
         'openfst_python': ['lib/*']
     },
-    cmdclass=dict(build_ext=OpenFstBuildExt),
+    cmdclass=dict(build_ext=OpenFstBuildExt, clean=OpenFstClean),
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
