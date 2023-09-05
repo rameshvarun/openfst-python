@@ -34,7 +34,7 @@ for py in "${PYTHON_VERSIONS[@]}"; do
     export PATH="$PATH:/opt/python/$py/bin/"
     echo "=== Installing dependencies for $py ===";
     $PYTHON -m pip install -U pip;
-    $PYTHON -m pip install -U requests==2.27 wheel==0.37 setuptools==59.6 Cython==0.29;
+    $PYTHON -m pip install -U requests~=2.27 wheel~=0.37 setuptools~=59.6 Cython~=0.29;
     echo "=== Building for $py ==="
     $PYTHON setup.py clean;
     $PYTHON setup.py bdist_wheel;
