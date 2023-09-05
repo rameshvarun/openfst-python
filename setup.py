@@ -83,7 +83,7 @@ with open(os.path.join(os.path.dirname(__file__), "README.md"), "r") as fh:
 
 setup(
     name="openfst_python",
-    version=OPENFST_VERSION,
+    version=OPENFST_VERSION + ".0",
     description="Stand-alone OpenFST bindings for Python",
     long_description=long_description,
     long_description_content_type="text/markdown",
