@@ -22,14 +22,6 @@ OPENFST_URL = f"http://www.openfst.org/twiki/pub/FST/FstDownload/{OPENFST_ARCHIV
 
 PACKAGE_DIR = os.path.realpath(os.path.dirname(__file__))
 
-class OpenFstClean(clean):
-    def run(self):
-        if os.path.exists(OPENFST_DIR):
-            shutil.rmtree(OPENFST_DIR)
-        if os.path.exists(OPENFST_ARCHIVE):
-            os.remove(OPENFST_ARCHIVE)
-        super().run()
-
 class OpenFstBuildExt(build_ext):
     def openfst_download_and_extract(self):
         # Skip if OpenFST dir already exists.
@@ -106,12 +98,8 @@ setup(
         include_dirs=[os.path.join(OPENFST_DIR, "src/include/")],
         library_dirs=[os.path.join(PACKAGE_DIR, "./openfst_python/lib")],
         libraries=["fst", "fstscript", "fstfar", "fstfarscript"],
-        extra_link_args = ["-Wl,-rpath=$ORIGIN/lib/."],
     )],
-    package_data={
-        'openfst_python': ['lib/*']
-    },
-    cmdclass=dict(build_ext=OpenFstBuildExt, clean=OpenFstClean),
+    cmdclass=dict(build_ext=OpenFstBuildExt),
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",

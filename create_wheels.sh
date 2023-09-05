@@ -25,7 +25,9 @@ set -ex;
 cp -r /host/src /tmp/src;
 rm -rf /tmp/src/build /tmp/src/dist;
 
-for py in cp36-cp36m; do
+declare -a PYTHON_VERSIONS=(cp36-cp36m cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310 cp311-cp311 cp312-cp312)
+
+for py in "${PYTHON_VERSIONS[@]}"; do
   (
     cd /tmp/src;
     export PYTHON=/opt/python/$py/bin/python;
@@ -54,7 +56,7 @@ echo "=== Reparing Wheels ===";
 )
 
 echo "=== Testing Wheels ==="
-for py in cp36-cp36m; do
+for py in "${PYTHON_VERSIONS[@]}"; do
   (
     cd /tmp;
     export PYTHON=/opt/python/$py/bin/python;
