@@ -21,8 +21,6 @@ fi;
 #######################################################
 set -ex;
 
-source /opt/rh/devtoolset-7/enable;
-
 # Copy host source directory, to avoid changes in the host.
 cp -r /host/src /tmp/src;
 rm -rf /tmp/src/build /tmp/src/dist;
@@ -34,15 +32,34 @@ for py in cp36-cp36m; do
     export PATH="$PATH:/opt/python/$py/bin/"
     echo "=== Installing dependencies for $py ===";
     $PYTHON -m pip install -U pip;
-    $PYTHON -m pip install -U requests==2.27 wheel==0.37 setuptools==59.6 Cython==0.29 auditwheel==1.0;
+    $PYTHON -m pip install -U requests==2.27 wheel==0.37 setuptools==59.6 Cython==0.29;
     echo "=== Building for $py ==="
     $PYTHON setup.py clean;
     $PYTHON setup.py bdist_wheel;
-    echo "=== Installing for $py ===";
-    cd /tmp; 
+  )
+done;
+
+echo "=== Reparing Wheels ===";
+(
+  export PYTHON=/opt/python/cp37-cp37m/bin/python;
+  export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/tmp/src/openfst_python/lib"
+
+  $PYTHON -m pip install -U auditwheel==5.4
+
+  cd /tmp/src/
+  for whl in dist/*.whl; do
+    $PYTHON -m auditwheel show "$whl"
+    $PYTHON -m auditwheel repair "$whl" -w /host/src/dist/wheelhouse
+  done
+)
+
+echo "=== Testing Wheels ==="
+for py in cp36-cp36m; do
+  (
+    cd /tmp;
+    export PYTHON=/opt/python/$py/bin/python;
     $PYTHON -m pip uninstall -y openfst_python;
-    $PYTHON -m pip install openfst_python --no-index -f /tmp/src/dist --no-dependencies -v;
-    echo "=== Testing for $py ===";
+    $PYTHON -m pip install openfst_python --no-index -f /host/src/dist/wheelhouse --no-dependencies -v;
     $PYTHON -m unittest openfst_python.test;
   )
 done;

@@ -7,6 +7,7 @@ import requests
 import shutil
 import subprocess
 import sys
+import multiprocessing
 
 from distutils.command.build import build
 from setuptools import setup, find_packages, Extension
@@ -58,14 +59,18 @@ class OpenFstBuildExt(build_ext):
             "--enable-lookahead-fsts",
             "--enable-special",
         ])
-        subprocess.check_call(["make", "-j8"])
+        subprocess.check_call(["make", f"-j{multiprocessing.cpu_count()}"])
         os.chdir(old_dir)
 
     def openfst_copy_libraries(self):
         libraries = [
+            "src/extensions/far/.libs/libfstfar.so",
             "src/extensions/far/.libs/libfstfar.so.17",
+            "src/extensions/far/.libs/libfstfarscript.so",
             "src/extensions/far/.libs/libfstfarscript.so.17",
+            "src/script/.libs/libfstscript.so",
             "src/script/.libs/libfstscript.so.17",
+            "src/lib/.libs/libfst.so",
             "src/lib/.libs/libfst.so.17",
         ]
         destination = "./openfst_python/lib"
