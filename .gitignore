@@ -104,3 +104,4 @@ venv.bak/
 .mypy_cache/
 
 openfst-*/
+openfst-*.tar.gz
