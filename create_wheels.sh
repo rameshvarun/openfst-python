@@ -25,7 +25,7 @@ set -ex;
 cp -r /host/src /tmp/src;
 rm -rf /tmp/src/build /tmp/src/dist;
 
-declare -a PYTHON_VERSIONS=(cp36-cp36m cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310 cp311-cp311 cp312-cp312)
+declare -a PYTHON_VERSIONS=(cp36-cp36m cp37-cp37m cp38-cp38 cp39-cp39)
 
 for py in "${PYTHON_VERSIONS[@]}"; do
   (
@@ -50,7 +50,6 @@ echo "=== Reparing Wheels ===";
 
   cd /tmp/src/
   for whl in dist/*.whl; do
-    $PYTHON -m auditwheel show "$whl"
     $PYTHON -m auditwheel repair "$whl" -w /host/src/dist/wheelhouse
   done
 )
