@@ -1,6 +1,6 @@
 # OpenFst-Python
 
-This project contains updated wheels for [jpuigcerver/openfst-python](https://github.com/jpuigcerver/openfst-python). Version number tracks OpenFst version, with an extra number to represent updates to this library. For example, `1.7.3.x` versions are all based off of OpenFst `1.7.3`.
+This project contains updated wheels for [jpuigcerver/openfst-python](https://github.com/jpuigcerver/openfst-python). Package version numbers tracks OpenFst versions, with an extra number to represent updates to this library. For example, `1.7.3.x` versions are all based off of OpenFst `1.7.3`.
 
 ## Installing
 
