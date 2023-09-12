@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from __future__ import print_function
 
 import hashlib
@@ -16,6 +17,7 @@ from distutils.command.clean import clean
 from Cython.Build import cythonize
 
 OPENFST_VERSION = "1.7.3"
+
 OPENFST_DIR = f"./openfst-{OPENFST_VERSION}"
 OPENFST_ARCHIVE = f"openfst-{OPENFST_VERSION}.tar.gz"
 OPENFST_URL = f"http://www.openfst.org/twiki/pub/FST/FstDownload/{OPENFST_ARCHIVE}"
