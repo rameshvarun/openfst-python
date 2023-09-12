@@ -24,7 +24,7 @@ OPENFST_ARCHIVE = f"openfst-{OPENFST_VERSION}.tar.gz"
 OPENFST_URL = f"http://www.openfst.org/twiki/pub/FST/FstDownload/{OPENFST_ARCHIVE}"
 
 PACKAGE_DIR = os.path.realpath(os.path.dirname(__file__))
-LIB_DIR = os.path.join(PACKAGE_DIR, "openfst-python", "libs")
+LIB_DIR = os.path.join(PACKAGE_DIR, "openfst_python", "lib")
 
 def openfst_download_and_extract():
     # Skip if OpenFST dir already exists.
@@ -78,7 +78,7 @@ openfst_download_and_extract()
 openfst_configure_and_make()
 openfst_copy_libraries()
 
-with open(os.path.join(os.path.dirname(__file__), "README.md"), "r") as fh:
+with open(os.path.join(PACKAGE_DIR, "README.md"), "r") as fh:
     long_description = fh.read()
 
 MANYLINUX_BUILD = os.environ.get("MANYLINUX_BUILD", "false").strip().lower() == "true"
@@ -100,7 +100,7 @@ setup(
         name="openfst_python.pywrapfst",
         sources=[os.path.join(OPENFST_DIR, "src/extensions/python/pywrapfst.cc")],
         include_dirs=[os.path.join(OPENFST_DIR, "src/include/")],
-        library_dirs=[os.path.join(PACKAGE_DIR, "./openfst_python/lib")],
+        library_dirs=[LIB_DIR],
         libraries=["fst", "fstscript", "fstfar", "fstfarscript"],
         extra_link_args=extra_link_args,
         extra_compile_args=["-std=c++11"]
