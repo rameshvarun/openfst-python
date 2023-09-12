@@ -9,7 +9,6 @@ SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)";
 if [ ! -f /.dockerenv ]; then
   docker build -t openfst-python-builder .
   docker run --rm --log-driver none \
-	 -v /tmp:/host/tmp \
 	 -v ${SOURCE_DIR}:/host/src \
 	 openfst-python-builder \
 	 /host/src/create_wheels.sh;
