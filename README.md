@@ -1,13 +1,26 @@
 # OpenFst-Python
 
-This project contains updated wheels for [jpuigcerver/openfst-python](https://github.com/jpuigcerver/openfst-python). Package version numbers track OpenFst versions, with an extra number to represent updates to this library. For example, `1.7.3.x` versions are all based off of OpenFst `1.7.3`.
+This project contains updated wheels for [jpuigcerver/openfst-python](https://github.com/jpuigcerver/openfst-python).
+Package version numbers track OpenFst versions, with an extra number to represent updates to this library.
+For example, `1.7.3.x` versions are all based off of OpenFst `1.7.3`.
 
 ## Installing
 
-You can install the package directly from [GitHub releases](https://github.com/rameshvarun/openfst-python/releases).
+You can install the package by using `--find-links`, pointing directly at a wheel, or using a source distribution.
 
 ```bash
-pip install https://github.com/rameshvarun/openfst-python/releases/download/v1.7.3.0/openfst_python-1.7.3.0-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+# Automatically select the correct wheel.
+pip install --find-links https://rameshvarun.github.io/openfst-python/ openfst-python==1.7.3.1
+
+# Directly install the provided wheel.
+pip install https://github.com/rameshvarun/openfst-python/releases/download/v1.7.3.1/openfst_python-1.7.3.1-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+
+# Install from source.
+pip install requests~=2.27 Cython~=0.29
+pip install https://github.com/rameshvarun/openfst-python/archive/refs/tags/v1.7.3.1.zip
+
+# Run package unit tests
+python -m unittest openfst_python.test
 ```
 
 ## Building Wheels
