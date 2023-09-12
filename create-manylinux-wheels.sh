@@ -11,7 +11,7 @@ if [ ! -f /.dockerenv ]; then
   docker run --rm --log-driver none \
 	 -v ${SOURCE_DIR}:/host/src \
 	 openfst-python-builder \
-	 /host/src/create_wheels.sh;
+	 /host/src/create-manylinux-wheels.sh;
   exit 0;
 fi;
 
