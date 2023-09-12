@@ -24,6 +24,7 @@ OPENFST_ARCHIVE = f"openfst-{OPENFST_VERSION}.tar.gz"
 OPENFST_URL = f"http://www.openfst.org/twiki/pub/FST/FstDownload/{OPENFST_ARCHIVE}"
 
 PACKAGE_DIR = os.path.realpath(os.path.dirname(__file__))
+LIB_DIR = os.path.join(PACKAGE_DIR, "openfst-python", "libs")
 
 def openfst_download_and_extract():
     # Skip if OpenFST dir already exists.
@@ -67,12 +68,11 @@ def openfst_copy_libraries():
         "src/lib/.libs/libfst.so",
         "src/lib/.libs/libfst.so.17",
     ]
-    destination = "./openfst_python/lib"
-    if not os.path.isdir(destination):
-        os.mkdir(destination)
+    if not os.path.isdir(LIB_DIR):
+        os.mkdir(LIB_DIR)
 
     for library in libraries:
-        shutil.copy(os.path.join(OPENFST_DIR, library), destination)
+        shutil.copy(os.path.join(OPENFST_DIR, library), LIB_DIR)
 
 openfst_download_and_extract()
 openfst_configure_and_make()
