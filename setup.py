@@ -17,6 +17,7 @@ from distutils.command.clean import clean
 from Cython.Build import cythonize
 
 OPENFST_VERSION = "1.7.3"
+LIBRARY_VERSION = "1"
 
 OPENFST_DIR = f"./openfst-{OPENFST_VERSION}"
 OPENFST_ARCHIVE = f"openfst-{OPENFST_VERSION}.tar.gz"
@@ -90,7 +91,7 @@ extra_link_args = None if MANYLINUX_BUILD else ["-Wl,-rpath=$ORIGIN/lib/."]
 
 setup(
     name="openfst_python",
-    version=OPENFST_VERSION + ".0",
+    version=f"{OPENFST_VERSION}.{LIBRARY_VERSION}",
     description="Stand-alone OpenFST bindings for Python",
     long_description=long_description,
     long_description_content_type="text/markdown",
