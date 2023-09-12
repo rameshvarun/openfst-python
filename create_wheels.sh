@@ -31,6 +31,7 @@ for py in "${PYTHON_VERSIONS[@]}"; do
     cd /tmp/src;
     export PYTHON=/opt/python/$py/bin/python;
     export PATH="$PATH:/opt/python/$py/bin/"
+    export MANYLINUX_BUILD=True
     echo "=== Installing dependencies for $py ===";
     $PYTHON -m pip install -U pip;
     $PYTHON -m pip install -U requests~=2.27 wheel~=0.37 setuptools~=59.6 Cython~=0.29;

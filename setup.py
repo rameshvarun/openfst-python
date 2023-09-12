@@ -25,7 +25,7 @@ OPENFST_URL = f"http://www.openfst.org/twiki/pub/FST/FstDownload/{OPENFST_ARCHIV
 
 PACKAGE_DIR = os.path.realpath(os.path.dirname(__file__))
 
-MANYLINUX_BUILD = os.environ.get("MANYLINUX_BUILD", False)
+MANYLINUX_BUILD = os.environ.get("MANYLINUX_BUILD", "false").strip().lower() == "true"
 
 class OpenFstBuildExt(build_ext):
     def openfst_download_and_extract(self):
@@ -86,8 +86,8 @@ class OpenFstBuildExt(build_ext):
 with open(os.path.join(os.path.dirname(__file__), "README.md"), "r") as fh:
     long_description = fh.read()
 
-package_data = None if MANYLINUX_BUILD else { 'openfst_python': ['lib/*'] }
-extra_link_args = None if MANYLINUX_BUILD else ["-Wl,-rpath=$ORIGIN/lib/."]
+package_data = {} if MANYLINUX_BUILD else { 'openfst_python': ['lib/*'] }
+extra_link_args = [] if MANYLINUX_BUILD else ["-Wl,-rpath=$ORIGIN/lib/."]
 
 setup(
     name="openfst_python",
@@ -107,6 +107,7 @@ setup(
         library_dirs=[os.path.join(PACKAGE_DIR, "./openfst_python/lib")],
         libraries=["fst", "fstscript", "fstfar", "fstfarscript"],
         extra_link_args=extra_link_args,
+        extra_compile_args=["-std=c++11"]
     )],
     package_data=package_data,
     cmdclass=dict(build_ext=OpenFstBuildExt),

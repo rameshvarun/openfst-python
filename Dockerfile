@@ -1,4 +1,3 @@
-FROM quay.io/pypa/manylinux2014_x86_64
+FROM quay.io/pypa/manylinux_2_28_x86_64
 
-RUN yum install -y centos-release-scl
-RUN yum install -y zlib-devel
+RUN yum update -y
