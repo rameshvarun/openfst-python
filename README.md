@@ -6,7 +6,7 @@ For example, `1.7.3.x` versions are all based off of OpenFst `1.7.3`.
 
 ## Installing
 
-You can install the package by using `--find-links`, pointing directly at a wheel, or using a source distribution.
+You can install the package by using `--find-links` or pointing directly at a wheel.
 
 ```bash
 # Automatically select the correct wheel.
@@ -14,10 +14,6 @@ pip install --find-links https://rameshvarun.github.io/openfst-python/ openfst-p
 
 # Directly install the provided wheel.
 pip install https://github.com/rameshvarun/openfst-python/releases/download/v1.7.3.1/openfst_python-1.7.3.1-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
-
-# Install from source.
-pip install requests~=2.27 Cython~=0.29
-pip install https://github.com/rameshvarun/openfst-python/archive/refs/tags/v1.7.3.1.zip
 
 # Run package unit tests
 python -m unittest openfst_python.test
