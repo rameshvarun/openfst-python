@@ -17,7 +17,7 @@ from distutils.command.clean import clean
 from Cython.Build import cythonize
 
 OPENFST_VERSION = "1.7.3"
-LIBRARY_VERSION = "1"
+LIBRARY_VERSION = "2"
 
 OPENFST_DIR = f"./openfst-{OPENFST_VERSION}"
 OPENFST_ARCHIVE = f"openfst-{OPENFST_VERSION}.tar.gz"
@@ -25,67 +25,63 @@ OPENFST_URL = f"http://www.openfst.org/twiki/pub/FST/FstDownload/{OPENFST_ARCHIV
 
 PACKAGE_DIR = os.path.realpath(os.path.dirname(__file__))
 
-MANYLINUX_BUILD = os.environ.get("MANYLINUX_BUILD", "false").strip().lower() == "true"
+def openfst_download_and_extract():
+    # Skip if OpenFST dir already exists.
+    if os.path.exists(OPENFST_DIR):
+        return
 
-class OpenFstBuildExt(build_ext):
-    def openfst_download_and_extract(self):
-        # Skip if OpenFST dir already exists.
-        if os.path.exists(OPENFST_DIR):
-            return
+    # Download OpenFST archive.
+    if not os.path.exists(OPENFST_ARCHIVE):
+        print("Downloading from %s" % OPENFST_URL)
+        r = requests.get(OPENFST_URL, verify=False, stream=True)
+        r.raw.decode_content = True
+        with open(OPENFST_ARCHIVE, "wb") as f:
+            shutil.copyfileobj(r.raw, f)
 
-        # Download OpenFST archive.
-        if not os.path.exists(OPENFST_ARCHIVE):
-            print("Downloading from %s" % OPENFST_URL)
-            r = requests.get(OPENFST_URL, verify=False, stream=True)
-            r.raw.decode_content = True
-            with open(OPENFST_ARCHIVE, "wb") as f:
-                shutil.copyfileobj(r.raw, f)
+    subprocess.check_call(["tar", "xzf", OPENFST_ARCHIVE])
 
-        subprocess.check_call(["tar", "xzf", OPENFST_ARCHIVE])
+def openfst_configure_and_make():
+    old_dir = os.getcwd()
+    os.chdir(OPENFST_DIR)
+    subprocess.check_call([
+        "./configure",
+        "--enable-compact-fsts",
+        "--enable-compress",
+        "--enable-const-fsts",
+        "--enable-far",
+        "--enable-linear-fsts",
+        "--enable-lookahead-fsts",
+        "--enable-special",
+    ])
+    subprocess.check_call(["make", f"-j{multiprocessing.cpu_count()}"])
+    os.chdir(old_dir)
 
-    def openfst_configure_and_make(self):
-        old_dir = os.getcwd()
-        os.chdir(OPENFST_DIR)
-        subprocess.check_call([
-            "./configure",
-            "--enable-compact-fsts",
-            "--enable-compress",
-            "--enable-const-fsts",
-            "--enable-far",
-            "--enable-linear-fsts",
-            "--enable-lookahead-fsts",
-            "--enable-special",
-        ])
-        subprocess.check_call(["make", f"-j{multiprocessing.cpu_count()}"])
-        os.chdir(old_dir)
+def openfst_copy_libraries():
+    libraries = [
+        "src/extensions/far/.libs/libfstfar.so",
+        "src/extensions/far/.libs/libfstfar.so.17",
+        "src/extensions/far/.libs/libfstfarscript.so",
+        "src/extensions/far/.libs/libfstfarscript.so.17",
+        "src/script/.libs/libfstscript.so",
+        "src/script/.libs/libfstscript.so.17",
+        "src/lib/.libs/libfst.so",
+        "src/lib/.libs/libfst.so.17",
+    ]
+    destination = "./openfst_python/lib"
+    if not os.path.isdir(destination):
+        os.mkdir(destination)
 
-    def openfst_copy_libraries(self):
-        libraries = [
-            "src/extensions/far/.libs/libfstfar.so",
-            "src/extensions/far/.libs/libfstfar.so.17",
-            "src/extensions/far/.libs/libfstfarscript.so",
-            "src/extensions/far/.libs/libfstfarscript.so.17",
-            "src/script/.libs/libfstscript.so",
-            "src/script/.libs/libfstscript.so.17",
-            "src/lib/.libs/libfst.so",
-            "src/lib/.libs/libfst.so.17",
-        ]
-        destination = "./openfst_python/lib"
-        if not os.path.isdir(destination):
-            os.mkdir(destination)
+    for library in libraries:
+        shutil.copy(os.path.join(OPENFST_DIR, library), destination)
 
-        for library in libraries:
-            shutil.copy(os.path.join(OPENFST_DIR, library), destination)
-
-    def run(self):
-        self.openfst_download_and_extract()
-        self.openfst_configure_and_make()
-        self.openfst_copy_libraries()
-        super().run()
+openfst_download_and_extract()
+openfst_configure_and_make()
+openfst_copy_libraries()
 
 with open(os.path.join(os.path.dirname(__file__), "README.md"), "r") as fh:
     long_description = fh.read()
 
+MANYLINUX_BUILD = os.environ.get("MANYLINUX_BUILD", "false").strip().lower() == "true"
 package_data = {} if MANYLINUX_BUILD else { 'openfst_python': ['lib/*'] }
 extra_link_args = [] if MANYLINUX_BUILD else ["-Wl,-rpath=$ORIGIN/lib/."]
 
@@ -110,7 +106,6 @@ setup(
         extra_compile_args=["-std=c++11"]
     )],
     package_data=package_data,
-    cmdclass=dict(build_ext=OpenFstBuildExt),
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
