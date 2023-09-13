@@ -13,7 +13,7 @@ You can install the package by using `--find-links` or pointing directly at a wh
 pip install --find-links https://rameshvarun.github.io/openfst-python/ openfst-python==1.7.3.2
 
 # Directly install the provided wheel.
-pip install https://github.com/rameshvarun/openfst-python/releases/download/v1.7.3.1/openfst_python-1.7.3.1-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+pip install https://github.com/rameshvarun/openfst-python/releases/download/v1.7.3.2/openfst_python-1.7.3.2-cp37-cp37m-manylinux_2_28_x86_64.whl
 
 # Run package unit tests
 python -m unittest openfst_python.test
