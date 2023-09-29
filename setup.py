@@ -9,6 +9,7 @@ import shutil
 import subprocess
 import sys
 import multiprocessing
+import platform
 
 from distutils.command.build import build
 from setuptools import setup, find_packages, Extension
@@ -46,6 +47,7 @@ def openfst_configure_and_make():
     os.chdir(OPENFST_DIR)
     subprocess.check_call([
         "./configure",
+        f"--libdir={LIB_DIR}",
         "--enable-compact-fsts",
         "--enable-compress",
         "--enable-const-fsts",
@@ -58,7 +60,7 @@ def openfst_configure_and_make():
     os.chdir(old_dir)
 
 def openfst_copy_libraries():
-    libraries = [
+    linux_libraries = [
         "src/extensions/far/.libs/libfstfar.so",
         "src/extensions/far/.libs/libfstfar.so.17",
         "src/extensions/far/.libs/libfstfarscript.so",
@@ -68,6 +70,25 @@ def openfst_copy_libraries():
         "src/lib/.libs/libfst.so",
         "src/lib/.libs/libfst.so.17",
     ]
+
+    macos_libraries = [
+        "src/extensions/far/.libs/libfstfar.dylib",
+        "src/extensions/far/.libs/libfstfar.17.dylib",
+        "src/extensions/far/.libs/libfstfarscript.dylib",
+        "src/extensions/far/.libs/libfstfarscript.17.dylib",
+        "src/script/.libs/libfstscript.dylib",
+        "src/script/.libs/libfstscript.17.dylib",
+        "src/lib/.libs/libfst.dylib",
+        "src/lib/.libs/libfst.17.dylib",
+    ]
+
+    if platform.system() == "Linux":
+        libraries = linux_libraries
+    elif platform.system() == "Darwin":
+        libraries = macos_libraries
+    else:
+        raise Exception(f"Unknown platform {platform.system()}")
+
     if not os.path.isdir(LIB_DIR):
         os.mkdir(LIB_DIR)
 

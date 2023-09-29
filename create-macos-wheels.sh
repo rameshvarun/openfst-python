@@ -1,0 +1,49 @@
+#!/bin/bash
+set -ex
+
+SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+rm -rf /tmp/openfst_python
+cp -r $SOURCE_DIR /tmp/openfst_python
+cd /tmp/openfst_python
+
+export MANYLINUX_BUILD=True
+
+declare -a PYTHON_VERSIONS=(python3.7 python3.8 python3.9)
+
+for py in "${PYTHON_VERSIONS[@]}"; do
+    (
+      echo "=== Building Wheel for $py ==="
+      $py -m venv ./$py-venv
+      source ./$py-venv/bin/activate
+
+      pip install -U requests~=2.27 wheel~=0.37 setuptools~=59.6 Cython~=0.29
+      python setup.py clean
+      python setup.py bdist_wheel
+    )
+done;
+
+echo "=== Reparing Wheels ===";
+(
+  cd /tmp/openfst_python
+  mkdir -p $SOURCE_DIR/dist/wheelhouse/
+  source ./python3.7-venv/bin/activate
+
+  pip install delocate~=0.10.4
+
+  for whl in dist/*.whl; do
+    delocate-wheel -w $SOURCE_DIR/dist/wheelhouse/ -v "$whl" 
+  done
+)
+
+echo "=== Testing Wheels ==="
+for py in "${PYTHON_VERSIONS[@]}"; do
+    (
+        cd /tmp/
+        source /tmp/openfst_python/$py-venv/bin/activate
+
+        pip uninstall -y openfst_python;
+        pip install openfst_python --no-index -f $SOURCE_DIR/dist/wheelhouse/ --no-dependencies -v;
+        python -m unittest openfst_python.test;
+    )
+done;
