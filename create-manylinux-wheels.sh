@@ -55,6 +55,11 @@ echo "=== Reparing Wheels ===";
 )
 
 echo "=== Testing Wheels ==="
+
+# Delete intermediates, so we can test that the wheels are actually self-contained,
+# and not just referring to libs by absolute path.
+rm -rf /tmp/src
+
 for py in "${PYTHON_VERSIONS[@]}"; do
   (
     cd /tmp;
