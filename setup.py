@@ -45,17 +45,21 @@ def openfst_download_and_extract():
 def openfst_configure_and_make():
     old_dir = os.getcwd()
     os.chdir(OPENFST_DIR)
-    subprocess.check_call([
-        "./configure",
-        f"--libdir={LIB_DIR}",
-        "--enable-compact-fsts",
-        "--enable-compress",
-        "--enable-const-fsts",
-        "--enable-far",
-        "--enable-linear-fsts",
-        "--enable-lookahead-fsts",
-        "--enable-special",
-    ])
+
+    # Generate Makefile if it doesn't exist.
+    if not os.path.exists("Makefile"):
+        subprocess.check_call([
+            "./configure",
+            f"--libdir={LIB_DIR}",
+            "--enable-compact-fsts",
+            "--enable-compress",
+            "--enable-const-fsts",
+            "--enable-far",
+            "--enable-linear-fsts",
+            "--enable-lookahead-fsts",
+            "--enable-special",
+        ])
+
     subprocess.check_call(["make", f"-j{multiprocessing.cpu_count()}"])
     os.chdir(old_dir)
 
