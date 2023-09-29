@@ -6,12 +6,15 @@ SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)";
 ###########################################
 ## THIS CODE IS EXECUTED WITHIN THE HOST ##
 ###########################################
+declare -a ARCHS=(x86_64 aarch64)
+
 if [ ! -f /.dockerenv ]; then
-  docker build -t openfst-python-builder .
-  docker run --rm --log-driver none \
-	 -v ${SOURCE_DIR}:/host/src \
-	 openfst-python-builder \
-	 /host/src/create-manylinux-wheels.sh;
+  for arch in "${ARCHS[@]}"; do
+    docker run --rm --log-driver none \
+      -v ${SOURCE_DIR}:/host/src \
+      quay.io/pypa/manylinux_2_28_$arch \
+      /host/src/create-manylinux-wheels.sh;
+  done;
   exit 0;
 fi;
 
@@ -19,6 +22,9 @@ fi;
 ## THIS CODE IS EXECUTED WITHIN THE DOCKER CONTAINER ##
 #######################################################
 set -ex;
+
+# Update packages within image.
+yum update -y
 
 # Copy host source directory, to avoid changes in the host.
 cp -r /host/src /tmp/src;
