@@ -21,12 +21,12 @@ python -m unittest openfst_python.test
 
 ## Building Wheels
 
-The wheels are built in a [manylinux](https://github.com/pypa/manylinux) Docker container. You must have Docker installed to build them.
+Manylinux wheels are built in a [manylinux](https://github.com/pypa/manylinux) Docker container. You must have Docker installed to build them.
 
 ```bash
 git clone https://github.com/rameshvarun/openfst-python.git
 cd openfst-python
-./create_wheels.sh
+./create-manylinux-wheels.sh
 
 # Wheels are built under dist/wheelhouse
 ls dist/wheelhouse
