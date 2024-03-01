@@ -11,14 +11,10 @@ import sys
 import multiprocessing
 import platform
 
-from distutils.command.build import build
 from setuptools import setup, find_packages, Extension
-from setuptools.command.build_ext import build_ext
-from distutils.command.clean import clean
-from Cython.Build import cythonize
 
 OPENFST_VERSION = "1.7.3"
-LIBRARY_VERSION = "2"
+LIBRARY_VERSION = "3"
 
 OPENFST_DIR = f"./openfst-{OPENFST_VERSION}"
 OPENFST_ARCHIVE = f"openfst-{OPENFST_VERSION}.tar.gz"
@@ -101,6 +97,11 @@ def openfst_copy_libraries():
 
 def regenerate_cython():
     # Regenerate Cython wrapper code.
+    backup_file = os.path.join(OPENFST_DIR, "src/extensions/python/pywrapfst.cc.backup")
+    if not os.path.exists(backup_file):
+        print("Creating a backup of pywrapfst.cc")
+        shutil.copy(os.path.join(OPENFST_DIR, "src/extensions/python/pywrapfst.cc"), backup_file)
+    
     subprocess.check_call("cython pywrapfst.pyx --cplus -o pywrapfst.cc",
         shell=True, cwd=os.path.join(OPENFST_DIR, "src/extensions/python"))
     
