@@ -99,9 +99,19 @@ def openfst_copy_libraries():
     for library in libraries:
         shutil.copy(os.path.join(OPENFST_DIR, library), LIB_DIR)
 
+def regenerate_cython():
+    # Regenerate Cython wrapper code.
+    subprocess.check_call("cython pywrapfst.pyx --cplus -o pywrapfst.cc",
+        shell=True, cwd=os.path.join(OPENFST_DIR, "src/extensions/python"))
+    
+    # Copy integral_types.h into the base/ folder.
+    os.makedirs(os.path.join(OPENFST_DIR, "src/extensions/python/base"), exist_ok=True)
+    shutil.copy(os.path.join(PACKAGE_DIR, "integral_types.h"), os.path.join(OPENFST_DIR, "src/extensions/python/base"))
+
 openfst_download_and_extract()
 openfst_configure_and_make()
 openfst_copy_libraries()
+regenerate_cython()
 
 with open(os.path.join(PACKAGE_DIR, "README.md"), "r") as fh:
     long_description = fh.read()
