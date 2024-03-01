@@ -30,7 +30,7 @@ yum update -y
 cp -r /host/src /tmp/src;
 rm -rf /tmp/src/build /tmp/src/dist;
 
-declare -a PYTHON_VERSIONS=(cp36-cp36m cp37-cp37m cp38-cp38 cp39-cp39)
+declare -a PYTHON_VERSIONS=(cp36-cp36m cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310 cp311-cp311 cp312-cp312)
 
 for py in "${PYTHON_VERSIONS[@]}"; do
   (
@@ -40,7 +40,13 @@ for py in "${PYTHON_VERSIONS[@]}"; do
     export MANYLINUX_BUILD=True
     echo "=== Installing dependencies for $py ===";
     $PYTHON -m pip install -U pip;
-    $PYTHON -m pip install -U requests~=2.27 wheel~=0.37 setuptools~=59.6 Cython~=0.29;
+
+    if [ "$py" == "cp36-cp36m" ]; then
+        $PYTHON -m pip install -U requests~=2.27 wheel~=0.37 setuptools~=59.6 Cython~=0.29;
+    else
+        $PYTHON -m pip install -U requests~=2.31 wheel~=0.42 setuptools~=68.0 Cython~=0.29;
+    fi
+
     echo "=== Building for $py ==="
     $PYTHON setup.py clean;
     $PYTHON setup.py bdist_wheel;
