@@ -9,7 +9,7 @@ cd /tmp/openfst_python
 
 export MANYLINUX_BUILD=True
 
-declare -a PYTHON_VERSIONS=(python3.7 python3.8 python3.9)
+declare -a PYTHON_VERSIONS=(python3.8 python3.9 python3.10 python3.11 python3.12)
 
 for py in "${PYTHON_VERSIONS[@]}"; do
     (
@@ -17,7 +17,8 @@ for py in "${PYTHON_VERSIONS[@]}"; do
       $py -m venv ./$py-venv
       source ./$py-venv/bin/activate
 
-      pip install -U requests~=2.27 wheel~=0.37 setuptools~=59.6 Cython~=0.29
+      pip install -U requests~=2.31 wheel~=0.42 setuptools~=68.0 Cython~=0.29
+
       python setup.py clean
       python setup.py bdist_wheel
     )
@@ -27,7 +28,7 @@ echo "=== Reparing Wheels ===";
 (
   cd /tmp/openfst_python
   mkdir -p $SOURCE_DIR/dist/wheelhouse/
-  source ./python3.7-venv/bin/activate
+  source ./python3.8-venv/bin/activate
 
   pip install delocate~=0.10.4
 
