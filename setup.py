@@ -19,6 +19,7 @@ LIBRARY_VERSION = "3"
 OPENFST_DIR = f"./openfst-{OPENFST_VERSION}"
 OPENFST_ARCHIVE = f"openfst-{OPENFST_VERSION}.tar.gz"
 OPENFST_URL = f"http://www.openfst.org/twiki/pub/FST/FstDownload/{OPENFST_ARCHIVE}"
+OPENFST_SHA256SUM = "b8dc6b4ca0f964faaf046577e4ad86b1a6ef544e35eacc6a5f16237f38300a0d"
 
 PACKAGE_DIR = os.path.realpath(os.path.dirname(__file__))
 LIB_DIR = os.path.join(PACKAGE_DIR, "openfst_python", "lib")
@@ -36,6 +37,12 @@ def openfst_download_and_extract():
         with open(OPENFST_ARCHIVE, "wb") as f:
             shutil.copyfileobj(r.raw, f)
 
+    # Check the SHA256 sum.
+    with open(OPENFST_ARCHIVE, "rb") as f:
+        sha256sum = hashlib.sha256(f.read()).hexdigest()
+        if sha256sum != OPENFST_SHA256SUM:
+            raise Exception(f"OpenFST SHA256 sum mismatch: {sha256sum} != {OPENFST_SHA256SUM}")
+        
     subprocess.check_call(["tar", "xzf", OPENFST_ARCHIVE])
 
 def openfst_configure_and_make():
